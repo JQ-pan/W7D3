@@ -10,17 +10,13 @@
 #  session_token   :string           not null
 #
 class User < ApplicationRecord
-    # debugger
+
     validates :username, :session_token, presence: true, uniqueness: true
     validates :password_digest, presence: true
     validates :password, length: {minimum: 6}, allow_nil: true
+    before_validation :ensure_session_token
 
     attr_reader :password
-
-    def username=(username)
-        @username = username
-        debugger
-    end
 
     def is_password?(other_pass)
         pass_object = BCrypt::Password.new(self.password_digest)
@@ -32,6 +28,8 @@ class User < ApplicationRecord
         @password = new_password
     end
 
-
+    def ensure_session_token
+        self.session_token ||= SecureRandom.urlsafe_base64
+    end
 
 end

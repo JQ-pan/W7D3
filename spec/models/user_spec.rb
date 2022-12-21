@@ -32,14 +32,33 @@ RSpec.describe User, type: :model do
     it { should validate_uniqueness_of(:session_token) }
   end
 
-  # describe "is_password?" do
-  #   let!(:user) {create(:user)}
+  describe "is_password?" do
+    let!(:user) {create(:user)}
 
-  #   context "with a valid password" do 
-  #     it "should return true" do
-  #       expect(user.is_password?("password")).to be true
-  #     end
-  #   end
+    context "with a valid password" do 
+      it "should return true" do
+        expect(user.is_password?("password")).to be true
+      end
+    end
 
-  #   context
+    context "with invalid password" do
+      it "should return false" do 
+        expect(user.is_password?("nc;oaien;lak")).to be false 
+      end
+    end
+  end
+
+  describe "password hashing" do 
+    it "does not save passwords to the database" do 
+      FactoryBot.create(:user, username: "Harry Potter")
+      user = User.find_by(username: "Harry Potter")
+      expect(user.password).not_to eq("password")
+    end
+
+    it "hashes password using BCrypt" do 
+      expect(BCrypt::Password).to receive(:create).with("12334566")
+      FactoryBot.build(:user, password: "12334566")
+    end
+  end
+
 end
