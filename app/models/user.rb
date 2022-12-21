@@ -18,10 +18,23 @@ class User < ApplicationRecord
 
     attr_reader :password
 
+    def self.find_by_credentials(username, password)
+        user = self.find_by(username: params[:username])
+        if user && user.is_password?(password)
+            user
+        else
+            nil 
+        end
+    end
+
     def is_password?(other_pass)
         pass_object = BCrypt::Password.new(self.password_digest)
         pass_object.is_password?(other_pass)
     end
+
+    # def self.generate_session_token
+    #     SecureRandom.urlsafe_base64
+    # end
 
     def password=(new_password)
         self.password_digest = BCrypt::Password.create(new_password)
